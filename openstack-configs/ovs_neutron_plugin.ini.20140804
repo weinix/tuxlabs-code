@@ -1,0 +1,15 @@
+[ovs]
+[agent]
+tunnel_types =vxlan
+vxlan_udp_port =4789
+l2_population = False
+[securitygroup]
+[OVS]
+local_ip=192.168.1.10
+enable_tunneling=True
+integration_bridge=br-int
+tunnel_bridge=br-tun
+[AGENT]
+polling_interval=2
+[SECURITYGROUP]
+firewall_driver=neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver

@@ -1,0 +1,58 @@
+[DEFAULT]
+verbose = True
+debug = False
+use_syslog = False
+log_dir =/var/log/neutron
+bind_host = 0.0.0.0
+bind_port = 9696
+core_plugin =neutron.plugins.ml2.plugin.Ml2Plugin
+service_plugins =neutron.services.l3_router.l3_router_plugin.L3RouterPlugin,neutron.services.firewall.fwaas_plugin.FirewallPlugin
+auth_strategy = keystone
+base_mac = fa:16:3e:00:00:00
+mac_generation_retries = 16
+dhcp_lease_duration = 86400
+allow_bulk = True
+allow_pagination = False
+allow_sorting = False
+allow_overlapping_ips = True
+rpc_backend = neutron.openstack.common.rpc.impl_kombu
+control_exchange = neutron
+rabbit_host = 192.168.1.10
+rabbit_password = guest
+rabbit_port = 5672
+rabbit_hosts = 192.168.1.10:5672
+rabbit_userid = guest
+rabbit_virtual_host = /
+rabbit_ha_queues = False
+agent_down_time = 75
+router_scheduler_driver = neutron.scheduler.l3_agent_scheduler.ChanceScheduler
+dhcp_agents_per_network = 1
+api_workers = 0
+notify_nova_on_port_status_changes = True
+notify_nova_on_port_data_changes = True
+nova_url = http://192.168.1.10:8774/v2
+nova_region_name =RegionOne
+nova_admin_username =nova
+nova_admin_tenant_id =d159fef0dc404ff1aa6b6020bc897c22
+nova_admin_password =cc6bb95225fc4a92
+nova_admin_auth_url =http://192.168.1.10:35357/v2.0
+send_events_interval = 2
+[quotas]
+[agent]
+root_helper = sudo neutron-rootwrap /etc/neutron/rootwrap.conf
+report_interval = 30
+[keystone_authtoken]
+auth_host = 192.168.1.10
+auth_port = 35357
+auth_protocol = http
+admin_tenant_name = services
+admin_user = neutron
+admin_password = 90a74077c901445b
+auth_uri=http://192.168.1.10:5000/
+[database]
+connection = mysql://neutron:c76e121ced3d4799@192.168.1.10/neutron
+max_retries = 10
+retry_interval = 10
+idle_timeout = 3600
+[service_providers]
+service_provider=VPN:openswan:neutron.services.vpn.service_drivers.ipsec.IPsecVPNDriver:default

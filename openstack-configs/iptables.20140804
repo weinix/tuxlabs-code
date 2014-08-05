@@ -1,0 +1,82 @@
+*mangle
+:PREROUTING ACCEPT [80984:62191578]
+:INPUT ACCEPT [80984:62191578]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [67242:11488880]
+:POSTROUTING ACCEPT [67242:11488880]
+:nova-api-POSTROUTING - [0:0]
+-A POSTROUTING -o virbr0 -p udp -m udp --dport 68 -j CHECKSUM --checksum-fill 
+-A POSTROUTING -j nova-api-POSTROUTING 
+COMMIT
+*nat
+:PREROUTING ACCEPT [257:115754]
+:POSTROUTING ACCEPT [4563:295355]
+:OUTPUT ACCEPT [4563:295355]
+:nova-api-OUTPUT - [0:0]
+:nova-api-POSTROUTING - [0:0]
+:nova-api-PREROUTING - [0:0]
+:nova-api-float-snat - [0:0]
+:nova-api-snat - [0:0]
+:nova-postrouting-bottom - [0:0]
+-A PREROUTING -j nova-api-PREROUTING 
+-A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p tcp -j MASQUERADE --to-ports 1024-65535 
+-A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p udp -j MASQUERADE --to-ports 1024-65535 
+-A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -j MASQUERADE 
+-A POSTROUTING -j nova-api-POSTROUTING 
+-A POSTROUTING -j nova-postrouting-bottom 
+-A OUTPUT -j nova-api-OUTPUT 
+-A nova-api-snat -j nova-api-float-snat 
+-A nova-postrouting-bottom -j nova-api-snat 
+COMMIT
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:nova-api-FORWARD - [0:0]
+:nova-api-INPUT - [0:0]
+:nova-api-OUTPUT - [0:0]
+:nova-api-local - [0:0]
+:nova-filter-top - [0:0]
+-A INPUT -i virbr0 -p udp -m udp --dport 53 -j ACCEPT 
+-A INPUT -i virbr0 -p tcp -m tcp --dport 53 -j ACCEPT 
+-A INPUT -i virbr0 -p udp -m udp --dport 67 -j ACCEPT 
+-A INPUT -i virbr0 -p tcp -m tcp --dport 67 -j ACCEPT 
+-A INPUT -j nova-api-INPUT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 5671,5672 -m comment --comment "001 amqp incoming amqp_192.168.1.10" -j ACCEPT 
+-A INPUT -p tcp -m multiport --dports 8777 -m comment --comment "001 ceilometer-api incoming ceilometer_api" -j ACCEPT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 3260,8776 -m comment --comment "001 cinder incoming cinder_192.168.1.10" -j ACCEPT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 9292 -m comment --comment "001 glance incoming glance_192.168.1.10" -j ACCEPT 
+-A INPUT -p tcp -m multiport --dports 80 -m comment --comment "001 horizon 80  incoming" -j ACCEPT 
+-A INPUT -p tcp -m multiport --dports 5000,35357 -m comment --comment "001 keystone incoming keystone" -j ACCEPT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 27017 -m comment --comment "001 mongodb-server incoming swift_storage_and_rsync_192.168.1.10" -j ACCEPT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 3306 -m comment --comment "001 mysql incoming mysql_192.168.1.10" -j ACCEPT 
+-A INPUT -p tcp -m multiport --dports 80 -m comment --comment "001 nagios incoming" -j ACCEPT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 5666 -m comment --comment "001 nagios-nrpe incoming nagios_nrpe" -j ACCEPT 
+-A INPUT -p udp -m multiport --dports 67 -m comment --comment "001 neutron dhcp in:  incoming neutron_dhcp_in_192.168.1.10" -j ACCEPT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 9696 -m comment --comment "001 neutron server incoming neutron_server_192.168.1.10_192.168.1.10" -j ACCEPT 
+-A INPUT -p udp -m multiport --dports 4789 -m comment --comment "001 neutron tunnel port incoming neutron_tunnel" -j ACCEPT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 5900:5999 -m comment --comment "001 nova compute incoming nova_compute" -j ACCEPT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 49152:49215 -m comment --comment "001 nova qemu migration incoming nova_qemu_migration_192.168.1.10_192.168.1.10" -j ACCEPT 
+-A INPUT -p tcp -m multiport --dports 8773,8774,8775 -m comment --comment "001 novaapi incoming" -j ACCEPT 
+-A INPUT -p tcp -m multiport --dports 6080 -m comment --comment "001 novncproxy incoming" -j ACCEPT 
+-A INPUT -p tcp -m multiport --dports 8080 -m comment --comment "001 swift proxy incoming" -j ACCEPT 
+-A INPUT -s 192.168.1.10/32 -p tcp -m multiport --dports 6000,6001,6002,873 -m comment --comment "001 swift storage and rsync incoming swift_storage_and_rsync_192.168.1.10" -j ACCEPT 
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A INPUT -p icmp -j ACCEPT 
+-A INPUT -i lo -j ACCEPT 
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT 
+-A INPUT -j REJECT --reject-with icmp-host-prohibited 
+-A FORWARD -d 192.168.122.0/24 -o virbr0 -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A FORWARD -s 192.168.122.0/24 -i virbr0 -j ACCEPT 
+-A FORWARD -i virbr0 -o virbr0 -j ACCEPT 
+-A FORWARD -o virbr0 -j REJECT --reject-with icmp-port-unreachable 
+-A FORWARD -i virbr0 -j REJECT --reject-with icmp-port-unreachable 
+-A FORWARD -j nova-filter-top 
+-A FORWARD -j nova-api-FORWARD 
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited 
+-A OUTPUT -p udp -m multiport --dports 68 -m comment --comment "001 neutron dhcp out:  outgoing neutron_dhcp_out_192.168.1.10" -j ACCEPT 
+-A OUTPUT -j nova-filter-top 
+-A OUTPUT -j nova-api-OUTPUT 
+-A nova-api-INPUT -d 192.168.1.10/32 -p tcp -m tcp --dport 8775 -j ACCEPT 
+-A nova-filter-top -j nova-api-local 
+COMMIT

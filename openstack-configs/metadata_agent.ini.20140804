@@ -1,0 +1,12 @@
+[DEFAULT]
+debug = False
+auth_url = http://192.168.1.10:35357/v2.0
+auth_region = RegionOne
+auth_insecure = False
+admin_tenant_name = services
+admin_user = neutron
+admin_password = 90a74077c901445b
+nova_metadata_ip = 192.168.1.10
+nova_metadata_port = 8775
+metadata_proxy_shared_secret =074e187bcf394bc7
+metadata_workers = 0

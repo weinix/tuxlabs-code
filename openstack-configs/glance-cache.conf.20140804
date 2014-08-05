@@ -1,0 +1,10 @@
+[DEFAULT]
+verbose=True
+debug=False
+registry_host=0.0.0.0
+registry_port=9191
+auth_url = http://localhost:5000/v2.0
+admin_tenant_name = services
+admin_user = glance
+admin_password = a4c613bd84dd4367
+filesystem_store_datadir=/var/lib/glance/images/
