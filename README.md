@@ -18,3 +18,5 @@ Tools used for deploying and maintaining openstack clouds.
 	Multi-threaded SSH command runner with sudo support
 ###### update-runner-hosts.pl
 	A perl script that grabs hosts from a URL and populates a hosts directory and required hosts file for runner.py
+###### sconnect
+	An SSH proxy used to forward SSH connections through a bastion/jump box. See https://bitbucket.org/gotoh/connect/wiki/Home for more info. 
