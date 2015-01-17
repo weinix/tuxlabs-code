@@ -99,7 +99,7 @@ def node_shell(hostname, site_user, site_passwd):
 			channel.send(sudocmd + '\n') 
 
 			buff = ''
-			while not '[sudo] password' in buff: #buff.startswith("[sudo] password"):
+			while not '[sudo] password' in buff: 
 				resp = channel.recv(9999)
 				buff += resp
 
