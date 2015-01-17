@@ -1,0 +1,13 @@
+[ml2]
+type_drivers = vxlan
+tenant_network_types = vxlan
+mechanism_drivers =openvswitch
+[ml2_type_flat]
+[ml2_type_vlan]
+[ml2_type_gre]
+[ml2_type_vxlan]
+vni_ranges =10:100
+vxlan_group =224.0.0.1
+[securitygroup]
+enable_security_group = True
+firewall_driver=True
