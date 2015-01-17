@@ -171,8 +171,11 @@ def get_hosts(file_path):
         seen = {}
         host_per_pool = []
         for host in selected_hosts:
-            if not host in seen:
-                seen[host] = 1
+	    # Here strip values that make hostnames unique like #'s
+	    # That way the dict matches after 1 host per pool has been seen 
+            nhost = re.sub("\d+?\.", ".", host) #Removing #'s in a hostname like host1234.tuxlabs.com
+            if not nhost in seen:
+                seen[nhost] = 1
                 host_per_pool.append(host)
         selected_hosts = host_per_pool
 
